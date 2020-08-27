@@ -1,0 +1,26 @@
+server:
+  port: 8000
+  read-timeout: 60
+  write-timeout: 60
+
+app:
+  #run-mode:debug/release
+  run-mode: debug
+  page-size: 10
+  log-path: ../log/debug.log
+  identity-key: idname
+
+database:
+  type: mysql
+  user: root
+  password: 123456
+  host: 127.0.0.1:3306
+  name: june
+  table-prefix: t_
+
+redis:
+  addr: 127.0.0.1:6379
+  pass: 
+  db: 1
+  timeout: 1000
+  expired-time: 3600
