@@ -1,21 +1,21 @@
-package returncode
+package hcode
 
 type HttpCode int32
 
 // 长度3位，和标准HTTP状态码保持一致
 const (
-	Ok                 HttpCode = 200
-	Created            HttpCode = 201
-	Accepted           HttpCode = 202
-	PartialContent     HttpCode = 206
-	NotModified        HttpCode = 304
-	Unauthorized       HttpCode = 401
-	Forbidden          HttpCode = 403
-	NotFound           HttpCode = 404
-	NotAcceptable      HttpCode = 406
-	Conflict           HttpCode = 409
-	InternalError      HttpCode = 500
-	ServiceUnavailable HttpCode = 503
+	Ok                 HttpCode = 200 * 1000000
+	Created            HttpCode = 201 * 1000000
+	Accepted           HttpCode = 202 * 1000000
+	PartialContent     HttpCode = 206 * 1000000
+	NotModified        HttpCode = 304 * 1000000
+	Unauthorized       HttpCode = 401 * 1000000
+	Forbidden          HttpCode = 403 * 1000000
+	NotFound           HttpCode = 404 * 1000000
+	NotAcceptable      HttpCode = 406 * 1000000
+	Conflict           HttpCode = 409 * 1000000
+	InternalError      HttpCode = 500 * 1000000
+	ServiceUnavailable HttpCode = 503 * 1000000
 )
 
 var HttCode = map[HttpCode]string{

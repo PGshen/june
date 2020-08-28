@@ -13,9 +13,9 @@ app:
 database:
   type: mysql
   user: root
-  password: 123456
+  password: One_123456
   host: 127.0.0.1:3306
-  name: june
+  name: september
   table-prefix: t_
 
 redis:

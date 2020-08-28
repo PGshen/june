@@ -1,12 +1,12 @@
-package returncode
+package tcode
 
 type TypeCode int32
 
 //长度1位
 var (
-	TypeNormal TypeCode = 0
-	Program    TypeCode = 1
-	Business   TypeCode = 2
+	TypeNormal TypeCode = 0 * 100000
+	Program    TypeCode = 1 * 100000
+	Business   TypeCode = 2 * 100000
 )
 
 var TypCode = map[TypeCode]string{

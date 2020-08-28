@@ -1,21 +1,21 @@
-package returncode
+package bcode
 
 type BusinessCode int32
 
 // 长度两位
 const (
-	BusinessNormal   BusinessCode = 0
-	BusinessAbnormal BusinessCode = 1
-	User             BusinessCode = 2
-	Role             BusinessCode = 3
-	Menu             BusinessCode = 4
-	Api              BusinessCode = 5
-	Client           BusinessCode = 6
-	Tenant           BusinessCode = 7
-	Org              BusinessCode = 8
-	Auth             BusinessCode = 9
-	Token            BusinessCode = 10
-	Permission       BusinessCode = 11
+	BusinessNormal   BusinessCode = 0 * 1000
+	BusinessAbnormal BusinessCode = 1 * 1000
+	User             BusinessCode = 2 * 1000
+	Role             BusinessCode = 3 * 1000
+	Menu             BusinessCode = 4 * 1000
+	Api              BusinessCode = 5 * 1000
+	Client           BusinessCode = 6 * 1000
+	Tenant           BusinessCode = 7 * 1000
+	Org              BusinessCode = 8 * 1000
+	Auth             BusinessCode = 9 * 1000
+	Token            BusinessCode = 10 * 1000
+	Permission       BusinessCode = 11 * 1000
 )
 
 var BusiCode = map[BusinessCode]string{

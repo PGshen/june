@@ -1,4 +1,4 @@
-package returncode
+package ecode
 
 type ErrorCode int32
 
@@ -68,7 +68,7 @@ var ErrCode = map[ErrorCode]string{
 	/**
 	 * 成功
 	 */
-	P0000: "",
+	P0000: "成功",
 	/**
 	 * 系统错误 1开头
 	 */

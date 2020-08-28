@@ -1,15 +1,15 @@
-package returncode
+package pcode
 
 type ProgramCode int32
 
 // 长度2位
 var (
-	ProgramNormal   ProgramCode = 0
-	ProgramAbnormal ProgramCode = 1
-	Db              ProgramCode = 2
-	Queue           ProgramCode = 3
-	Log             ProgramCode = 4
-	Stream          ProgramCode = 5
+	ProgramNormal   ProgramCode = 0 * 1000
+	ProgramAbnormal ProgramCode = 1 * 1000
+	Db              ProgramCode = 2 * 1000
+	Queue           ProgramCode = 3 * 1000
+	Log             ProgramCode = 4 * 1000
+	Stream          ProgramCode = 5 * 1000
 )
 
 var ProgCode = map[ProgramCode]string{
