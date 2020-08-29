@@ -45,8 +45,13 @@ func Configure(r *gin.Engine) {
 	if err := db.Connect(); err != nil {
 		log.Fatal("db fatal:", err)
 	}
-	apiv1 := r.Group("/api/v1")
+	sysApi := r.Group("")
 	{
-		apiv1.GET("/api/:id", api.GetApi)
+		sysApi.GET("/api/:id", api.GetApiById)
+		sysApi.POST("/api", api.SaveApi)
+		sysApi.PUT("/api/:id", api.EditApi)
+		sysApi.DELETE("/api/:id", api.DelApi)
+		sysApi.GET("/api/tree", api.ApiTree)
+		sysApi.GET("/api/tree/:id", api.ApiTreeById)
 	}
 }

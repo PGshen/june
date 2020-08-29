@@ -7,7 +7,7 @@ app:
   #run-mode:debug/release
   run-mode: debug
   page-size: 10
-  log-path: ../log/debug.log
+  log-path: log
   identity-key: idname
 
 database:
@@ -15,7 +15,7 @@ database:
   user: root
   password: One_123456
   host: 127.0.0.1:3306
-  name: september
+  name: june
   table-prefix: t_
 
 redis:

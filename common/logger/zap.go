@@ -1,10 +1,12 @@
 package logger
 
 import (
+	"fmt"
 	"github.com/PGshen/june/common/setting"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"gopkg.in/natefinch/lumberjack.v2"
+	"time"
 )
 
 // Logger Log *zap.SugaredLogger
@@ -14,10 +16,13 @@ type Logger struct {
 
 //init 初始化日志配置
 func (l *Logger) Init() {
+	now := time.Now()
 	w := zapcore.AddSync(&lumberjack.Logger{
-		Filename:  setting.Config.App.LogPath,
-		MaxSize:   1024, //MB
-		LocalTime: true,
+		Filename:   fmt.Sprintf("%s/%04d%02d%02d%s", setting.Config.App.LogPath, now.Year(), now.Month(), now.Day(), ".log"), //filePath
+		MaxSize:    2,                                                                                                        // megabytes
+		MaxBackups: 100,
+		MaxAge:     30, //days
+		Compress:   false,
 	})
 
 	config := zap.NewProductionEncoderConfig()
