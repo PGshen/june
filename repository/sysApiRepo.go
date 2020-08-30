@@ -7,6 +7,9 @@ import (
 
 type ISysApiRepo interface {
 	GetApiById(id int) *models.SysApi
+	InsertApi(api *models.SysApi) bool
+	UpdateApi(api *models.SysApi) bool
+	DeleteApi(id int) bool
 }
 
 // 依赖注入
@@ -45,10 +48,10 @@ func (apiRepo *SysApiRepo) UpdateApi(api *models.SysApi) bool {
 }
 
 // 删除
-func (apiRepo *SysApiRepo) deleteApi(apiId int) bool {
+func (apiRepo *SysApiRepo) DeleteApi(apiId int) bool {
 	api := models.SysApi{}
 	if err := apiRepo.BaseRepo.DeleteByID(api, apiId); err != nil {
-		apiRepo.Log.Errorf("删除用户失败", err)
+		apiRepo.Log.Errorf("删除API接口失败", err)
 		return false
 	}
 	return true
