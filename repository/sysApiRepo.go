@@ -39,8 +39,9 @@ func (apiRepo *SysApiRepo) InsertApi(api *models.SysApi) bool {
 
 // 更新
 func (apiRepo *SysApiRepo) UpdateApi(api *models.SysApi) bool {
-	//使用事务同时更新用户数据和角色数据
-	if err := apiRepo.BaseRepo.Save(api).Error; err != nil {
+	//if err := apiRepo.BaseRepo.Source.DB().Model(&models.SysApi{}).Where("api_id = ?", api.ApiId).Update(api).Error; err != nil {
+	// api 如果带了主键则不需要再查询一次
+	if err := apiRepo.BaseRepo.Source.DB().Model(&api).Update(api).Error; err != nil {
 		apiRepo.Log.Errorf("更新API接口失败", err)
 		return false
 	}
@@ -50,9 +51,11 @@ func (apiRepo *SysApiRepo) UpdateApi(api *models.SysApi) bool {
 // 删除
 func (apiRepo *SysApiRepo) DeleteApi(apiId int) bool {
 	api := models.SysApi{}
-	if err := apiRepo.BaseRepo.DeleteByID(api, apiId); err != nil {
+	where := &models.SysApi{ApiId: int32(apiId)}
+	if count, err := apiRepo.BaseRepo.DeleteByWhere(api, where); err != nil {
 		apiRepo.Log.Errorf("删除API接口失败", err)
 		return false
+	} else {
+		return count > 0
 	}
-	return true
 }

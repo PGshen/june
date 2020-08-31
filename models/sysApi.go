@@ -25,11 +25,12 @@ func (SysApi) TableName() string {
 }
 
 func (sysApi *SysApi) BeforeCreate(scope *gorm.Scope) error {
-	err := scope.SetColumn("CreatedTime", time.Now().Unix())
+	err := scope.SetColumn("CreatedTime", time.Now())
+	err = scope.SetColumn("UpdateTime", time.Now())
 	return err
 }
 
 func (sysApi *SysApi) BeforeUpdate(scope *gorm.Scope) error {
-	err := scope.SetColumn("UpdateTime", time.Now().Unix())
+	err := scope.SetColumn("UpdateTime", time.Now())
 	return err
 }

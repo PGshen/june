@@ -13,10 +13,10 @@ app:
 database:
   type: mysql
   user: root
-  password: 123456
-  host: 14.215.47.163:3306
+  password: One_123456
+  host: 14.215.47.22:3306
   name: june
-  table-prefix: t_
+#  table-prefix: t_
 
 redis:
   addr: 127.0.0.1:6379

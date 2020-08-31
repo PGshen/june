@@ -47,11 +47,11 @@ func Configure(r *gin.Engine) {
 	}
 	sysApi := r.Group("")
 	{
-		sysApi.GET("/api/:id", api.GetApiById)
+		sysApi.GET("/api", api.GetApiById)
 		sysApi.POST("/api", api.SaveApi)
 		sysApi.PUT("/api/:id", api.EditApi)
 		sysApi.DELETE("/api/:id", api.DelApi)
-		// sysApi.GET("/api/tree", api.ApiTree)
-		// sysApi.GET("/api/tree/:id", api.ApiTreeById)
+		sysApi.GET("/api/tree", api.ApiTree)
+		sysApi.GET("/api/tree/:id", api.ApiTreeById)
 	}
 }
