@@ -48,6 +48,7 @@ func Configure(r *gin.Engine) {
 	sysApi := r.Group("")
 	{
 		sysApi.GET("/api", api.GetApiById)
+		sysApi.POST("/apis", api.ListApi)
 		sysApi.POST("/api", api.SaveApi)
 		sysApi.PUT("/api/:id", api.EditApi)
 		sysApi.DELETE("/api/:id", api.DelApi)

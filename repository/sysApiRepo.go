@@ -10,6 +10,7 @@ type ISysApiRepo interface {
 	InsertApi(api *models.SysApi) bool
 	UpdateApi(api *models.SysApi) bool
 	DeleteApi(id int) bool
+	ListApi(page int32, size int32, total *int32, where interface{}) []*models.SysApi
 }
 
 // 依赖注入
@@ -58,4 +59,12 @@ func (apiRepo *SysApiRepo) DeleteApi(apiId int) bool {
 	} else {
 		return count > 0
 	}
+}
+
+func (apiRepo *SysApiRepo) ListApi(page int32, size int32, total *int32, where interface{}) []*models.SysApi {
+	var apis []*models.SysApi
+	if err := apiRepo.BaseRepo.GetPages(&models.SysApi{}, &apis, page, size, total, where); err != nil {
+		apiRepo.Log.Error("获取API列表失败：", err)
+	}
+	return apis
 }

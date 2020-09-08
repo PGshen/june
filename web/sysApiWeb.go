@@ -2,6 +2,7 @@ package web
 
 import (
 	"github.com/PGshen/june/common/logger"
+	"github.com/PGshen/june/common/req"
 	"github.com/PGshen/june/common/resp"
 	"github.com/PGshen/june/common/returncode/bcode"
 	"github.com/PGshen/june/common/returncode/ecode"
@@ -80,15 +81,33 @@ func (apiWeb *SysApiWeb) DelApi(c *gin.Context) {
 
 // [API接口]分页获取API接口
 func (apiWeb *SysApiWeb) ListApi(c *gin.Context) {
-
-}
-
-// [API接口]按ID获取API接口树
-func (apiWeb *SysApiWeb) ApiTree(c *gin.Context) {
-
+	reqCond := req.ReqCond{}
+	err := c.BindJSON(&reqCond)
+	if err != nil {
+		resp.RespB406(c, bcode.Api, ecode.P0317, nil)
+	} else {
+		apiWeb.ApiService.ListApi(c, &reqCond)
+	}
 }
 
 // [API接口]获取完整API接口树
-func (apiWeb *SysApiWeb) ApiTreeById(c *gin.Context) {
+func (apiWeb *SysApiWeb) ApiTree(c *gin.Context) {
+	apiWeb.ApiService.GetApiTree(c)
+}
 
+// [API接口]按ID获取API接口树
+func (apiWeb *SysApiWeb) ApiTreeById(c *gin.Context) {
+	id, _ := strconv.Atoi(c.Param("id"))
+	valid := validation.Validation{}
+	valid.Min(id, 1, "id").Message("ID必须大于0")
+	if !valid.HasErrors() {
+		apiWeb.ApiService.GetApiTreeById(c, id)
+	} else {
+		var errMsg = ""
+		for _, err := range valid.Errors {
+			apiWeb.Log.Info("err.key: %s, err.message: %s", err.Key, err.Message)
+			errMsg += err.Message
+		}
+		resp.RespB406s(c, bcode.Api, ecode.P0308, errMsg, nil)
+	}
 }

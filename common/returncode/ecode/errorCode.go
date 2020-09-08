@@ -30,6 +30,7 @@ const (
 	P0314 ErrorCode = 314
 	P0315 ErrorCode = 315
 	P0316 ErrorCode = 316
+	P0317 ErrorCode = 317
 
 	P0401 ErrorCode = 401
 	P0402 ErrorCode = 402
@@ -102,6 +103,7 @@ var ErrCode = map[ErrorCode]string{
 	P0314: "数据删除失败",
 	P0315: "远程查询返回失败",
 	P0316: "数据解析失败",
+	P0317: "数据绑定失败",
 
 	/**
 	 * 网络类
