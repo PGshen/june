@@ -11,6 +11,7 @@ type ISysApiRepo interface {
 	UpdateApi(api *models.SysApi) bool
 	DeleteApi(id int) bool
 	ListApi(page int32, size int32, total *int32, where interface{}) []*models.SysApi
+	GetApiByPid(pid int) []*models.SysApi
 }
 
 // 依赖注入
@@ -27,6 +28,15 @@ func (apiRepo *SysApiRepo) GetApiById(id int) *models.SysApi {
 		return nil
 	}
 	return &api
+}
+
+func (apiRepo *SysApiRepo) GetApiByPid(pid int) []*models.SysApi {
+	var apis []*models.SysApi
+	where := &models.SysApi{ParentApiId: int32(pid)}
+	if err := apiRepo.BaseRepo.Source.DB().Where(where).Find(&apis); err != nil {
+		apiRepo.Log.Error("获取API失败", err)
+	}
+	return apis
 }
 
 // 保存
@@ -53,7 +63,7 @@ func (apiRepo *SysApiRepo) UpdateApi(api *models.SysApi) bool {
 func (apiRepo *SysApiRepo) DeleteApi(apiId int) bool {
 	api := models.SysApi{}
 	where := &models.SysApi{ApiId: int32(apiId)}
-	if count, err := apiRepo.BaseRepo.DeleteByWhere(api, where); err != nil {
+	if count, err := apiRepo.BaseRepo.DeleteByWhere(&api, where); err != nil {
 		apiRepo.Log.Errorf("删除API接口失败", err)
 		return false
 	} else {

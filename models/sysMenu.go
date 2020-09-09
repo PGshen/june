@@ -20,7 +20,6 @@ type SysMenu struct {
 	IsDel        int       `json:"is_del"`
 	CreatedTime  time.Time `json:"created_time"`
 	UpdateTime   time.Time `json:"update_time"`
-	TenantId     string    `json:"tenant_id"`
 }
 
 func (SysMenu) TableName() string {

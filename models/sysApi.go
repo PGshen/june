@@ -17,7 +17,11 @@ type SysApi struct {
 	IsDel       int       `json:"is_del"`
 	CreatedTime time.Time `json:"created_time"`
 	UpdateTime  time.Time `json:"update_time"`
-	TenantId    string    `json:"tenant_id"`
+}
+
+type SysApiTree struct {
+	SysApi
+	Children []SysApiTree `json:"children"`
 }
 
 func (SysApi) TableName() string {

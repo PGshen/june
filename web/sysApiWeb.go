@@ -92,7 +92,7 @@ func (apiWeb *SysApiWeb) ListApi(c *gin.Context) {
 
 // [API接口]获取完整API接口树
 func (apiWeb *SysApiWeb) ApiTree(c *gin.Context) {
-	apiWeb.ApiService.GetApiTree(c)
+	apiWeb.ApiService.GetApiTrees(c)
 }
 
 // [API接口]按ID获取API接口树

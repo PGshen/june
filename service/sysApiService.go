@@ -17,7 +17,7 @@ type ISysApiService interface {
 	UpdateApi(c *gin.Context, sysApi *models.SysApi)
 	DeleteApi(c *gin.Context, id int)
 	ListApi(c *gin.Context, reqCond *req.ReqCond)
-	GetApiTree(c *gin.Context)
+	GetApiTrees(c *gin.Context)
 	GetApiTreeById(c *gin.Context, id int)
 }
 
@@ -63,7 +63,7 @@ func (apiService *SysApiService) DeleteApi(c *gin.Context, id int) {
 	if apiService.Repo.DeleteApi(id) {
 		resp.RespB200(c, bcode.Api, "")
 	} else {
-		resp.RespB406s(c, bcode.Api, ecode.P0301, "", nil)
+		resp.RespB406s(c, bcode.Api, ecode.P0302, "", nil)
 	}
 }
 
@@ -79,12 +79,34 @@ func (apiService *SysApiService) ListApi(c *gin.Context, reqCond *req.ReqCond) {
 }
 
 // 完整API树
-func (apiService *SysApiService) GetApiTree(c *gin.Context) {
+func (apiService *SysApiService) GetApiTrees(c *gin.Context) {
 	apiService.Log.Info("Get api tree")
-
+	apiService.GetApiTreeById(c, 1)
 }
 
 // 指定ID的API树
 func (apiService *SysApiService) GetApiTreeById(c *gin.Context, id int) {
 	apiService.Log.Info("Get api tree by id, id = %s", id)
+	// todo 检查ID
+	apiTree := apiService.GetApiTree(id)
+	if apiTree == nil {
+		resp.RespB406(c, bcode.Api, ecode.P0301, nil)
+	} else {
+		resp.RespB200(c, bcode.Api, apiTree)
+	}
+}
+
+func (apiService *SysApiService) GetApiTree(id int) *models.SysApiTree {
+	var apiTree = models.SysApiTree{}
+	api := apiService.Repo.GetApiById(id)
+	if api == nil {
+		return nil
+	}
+	apiTree.SysApi = *api
+	sysApis := apiService.Repo.GetApiByPid(id)
+	// 递归查询自节点
+	for child := range sysApis {
+		apiTree.Children = append(apiTree.Children, *apiService.GetApiTree(int(sysApis[child].ApiId)))
+	}
+	return &apiTree
 }

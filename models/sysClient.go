@@ -1,6 +1,9 @@
 package models
 
-import "time"
+import (
+	"github.com/jinzhu/gorm"
+	"time"
+)
 
 type SysClient struct {
 	ClientId              int32  `gorm:"primary_key" json:"client_id"`
@@ -20,9 +23,19 @@ type SysClient struct {
 
 	CreatedTime time.Time `json:"created_time"`
 	UpdateTime  time.Time `json:"modified_time"`
-	TenantId    string    `json:"tenant_id"`
 }
 
 func (SysClient) TableName() string {
 	return "t_sys_client"
+}
+
+func (sysClient *SysClient) BeforeCreate(scope *gorm.Scope) error {
+	err := scope.SetColumn("CreatedTime", time.Now())
+	err = scope.SetColumn("UpdateTime", time.Now())
+	return err
+}
+
+func (sysClient *SysClient) BeforeUpdate(scope *gorm.Scope) error {
+	err := scope.SetColumn("UpdateTime", time.Now())
+	return err
 }

@@ -67,7 +67,8 @@ func RespBusiData(c *gin.Context, httpCode hcode.HttpCode, typeCode tcode.TypeCo
 		Message: businessMsg + errorMsg,
 		Data:    data,
 	}
-	RespJSON(c, int(httpCode)/1000000, resp)
+	//RespJSON(c, int(httpCode)/1000000, resp)
+	RespJSON(c, 200, resp)
 }
 
 // 程序错误
@@ -81,7 +82,8 @@ func RespProgramData(c *gin.Context, httpCode hcode.HttpCode, typeCode tcode.Typ
 		Message: businessMsg + errorMsg,
 		Data:    data,
 	}
-	RespJSON(c, int(httpCode)/1000000, resp)
+	//RespJSON(c, int(httpCode)/1000000, resp)
+	RespJSON(c, 200, resp)
 }
 
 //RespJSON 返回JSON数据

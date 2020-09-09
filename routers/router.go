@@ -23,16 +23,20 @@ func InitRouter() *gin.Engine {
 func Configure(r *gin.Engine) {
 	//inject declare
 	var api web.SysApiWeb
+	var client web.SysClientWeb
 	db := datasource.Db{}
 	zap := logger.Logger{}
 	var injector inject.Graph
 	if err := injector.Provide(
 		&inject.Object{Value: &api},
+		&inject.Object{Value: &client},
 		&inject.Object{Value: &db},
 		&inject.Object{Value: &zap},
+		&inject.Object{Value: &repository.BaseRepo{}},
 		&inject.Object{Value: &repository.SysApiRepo{}},
 		&inject.Object{Value: &service.SysApiService{}},
-		&inject.Object{Value: &repository.BaseRepo{}},
+		&inject.Object{Value: &repository.SysClientRepo{}},
+		&inject.Object{Value: &service.SysClientService{}},
 	); err != nil {
 		log.Fatal("inject fatal: ", err)
 	}
@@ -54,5 +58,13 @@ func Configure(r *gin.Engine) {
 		sysApi.DELETE("/api/:id", api.DelApi)
 		sysApi.GET("/api/tree", api.ApiTree)
 		sysApi.GET("/api/tree/:id", api.ApiTreeById)
+	}
+	sysClient := r.Group("")
+	{
+		sysClient.GET("/client", client.GetClientById)
+		sysClient.POST("/clients", client.ListClient)
+		sysClient.POST("/client", client.SaveClient)
+		sysClient.PUT("/client/:id", client.EditClient)
+		sysClient.DELETE("/client/:id", client.DelClient)
 	}
 }
