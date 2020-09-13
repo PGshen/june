@@ -1,6 +1,9 @@
 package models
 
-import "time"
+import (
+	"github.com/jinzhu/gorm"
+	"time"
+)
 
 type SysMenu struct {
 	MenuId       int32     `gorm:"primary_key" json:"menu_id"`
@@ -22,6 +25,22 @@ type SysMenu struct {
 	UpdateTime   time.Time `json:"update_time"`
 }
 
+type SysMenuTree struct {
+	SysMenu
+	Children []SysMenuTree `json:"children"`
+}
+
 func (SysMenu) TableName() string {
 	return "t_sys_menu"
+}
+
+func (sysMenu *SysMenu) BeforeCreate(scope *gorm.Scope) error {
+	err := scope.SetColumn("CreatedTime", time.Now())
+	err = scope.SetColumn("UpdateTime", time.Now())
+	return err
+}
+
+func (sysMenu *SysMenu) BeforeUpdate(scope *gorm.Scope) error {
+	err := scope.SetColumn("UpdateTime", time.Now())
+	return err
 }
