@@ -71,16 +71,9 @@ func (repo *SysMenuRepo) ListMenu(page, size int32, total *int32, where interfac
 
 func (repo *SysMenuRepo) GetMenuByRoleId(roleId int32) []*models.SysMenu {
 	var menus []*models.SysMenu
-	rows, err := repo.BaseRepo.Source.DB().Raw("select m.* from t_sys_menu m, t_sys_role_menu rm where m.menu_id = rm.menu_id and rm.role_id = ?", roleId).Rows()
+	err := repo.BaseRepo.Source.DB().Raw("select m.* from t_sys_menu m, t_sys_role_menu rm where m.menu_id = rm.menu_id and rm.role_id = ?", roleId).Find(&menus).Error
 	if err != nil {
 		repo.Log.Errorf("查询数据失败", err)
-		return menus
-	}
-	defer rows.Close()
-	for rows.Next() {
-		var menu models.SysMenu
-		_ = rows.Scan(rows, &menu)
-		menus = append(menus, &menu)
 	}
 	return menus
 }
@@ -88,7 +81,7 @@ func (repo *SysMenuRepo) GetMenuByRoleId(roleId int32) []*models.SysMenu {
 func (repo *SysMenuRepo) GetMenuIdByRoleId(roleId int32) []int32 {
 	var menuIds []int32
 	where := map[string]int32{"role_id": roleId}
-	if err := repo.BaseRepo.Find(&where, &menuIds, "menu_id"); err != nil {
+	if err := repo.BaseRepo.Source.DB().Table("t_sys_role_menu").Find(&where, &menuIds, "menu_id"); err != nil {
 		repo.Log.Errorf("查询数据失败", err)
 	}
 	return menuIds

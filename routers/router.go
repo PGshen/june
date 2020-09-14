@@ -24,12 +24,18 @@ func Configure(r *gin.Engine) {
 	//inject declare
 	var api web.SysApiWeb
 	var client web.SysClientWeb
+	var menu web.SysMenuWeb
+	var role web.SysRoleWeb
+	var user web.SysUserWeb
 	db := datasource.Db{}
 	zap := logger.Logger{}
 	var injector inject.Graph
 	if err := injector.Provide(
 		&inject.Object{Value: &api},
 		&inject.Object{Value: &client},
+		&inject.Object{Value: &menu},
+		&inject.Object{Value: &role},
+		&inject.Object{Value: &user},
 		&inject.Object{Value: &db},
 		&inject.Object{Value: &zap},
 		&inject.Object{Value: &repository.BaseRepo{}},
@@ -37,6 +43,12 @@ func Configure(r *gin.Engine) {
 		&inject.Object{Value: &service.SysApiService{}},
 		&inject.Object{Value: &repository.SysClientRepo{}},
 		&inject.Object{Value: &service.SysClientService{}},
+		&inject.Object{Value: &repository.SysMenuRepo{}},
+		&inject.Object{Value: &service.SysMenuService{}},
+		&inject.Object{Value: &repository.SysRoleRepo{}},
+		&inject.Object{Value: &service.SysRoleService{}},
+		&inject.Object{Value: &repository.SysUserRepo{}},
+		&inject.Object{Value: &service.SysUserService{}},
 	); err != nil {
 		log.Fatal("inject fatal: ", err)
 	}
@@ -62,9 +74,54 @@ func Configure(r *gin.Engine) {
 	sysClient := r.Group("")
 	{
 		sysClient.GET("/client", client.GetClientById)
-		sysClient.POST("/clients", client.ListClient)
+		sysClient.POST("/clients/list", client.ListClient)
 		sysClient.POST("/client", client.SaveClient)
 		sysClient.PUT("/client/:id", client.EditClient)
 		sysClient.DELETE("/client/:id", client.DelClient)
+
+		sysClient.GET("/clients/ip/:id", client.GetClientIp)
+		sysClient.POST("/clients/ip", client.SaveClientIp)
+		sysClient.DELETE("/clients/ip/:id", client.DelClientIp)
+
+		sysClient.POST("/clients/ips/apis/list", client.GetClientIpApi)
+		sysClient.POST("/clients/ips/api", client.AuthClientIpApi)
+	}
+	sysMenu := r.Group("")
+	{
+		sysMenu.GET("/menu", menu.GetMenuById)
+		sysMenu.POST("/menus/list", menu.ListMenu)
+		sysMenu.POST("/menu", menu.SaveMenu)
+		sysMenu.PUT("/menu/:id", menu.EditMenu)
+		sysMenu.DELETE("/menu/:id", menu.DelMenu)
+
+		sysMenu.GET("/menus/tree/:id", menu.GetMenuTreeById)
+		sysMenu.GET("/menus/trees/all", menu.GetMenuTree)
+
+		sysMenu.GET("/menus/api/:id", menu.GetMenuApiById)
+		sysMenu.PUT("/menus/api", menu.AuthMenuApi)
+	}
+	sysRole := r.Group("")
+	{
+		sysRole.GET("/role", role.GetRoleById)
+		sysRole.POST("/roles/list", role.ListRole)
+		sysRole.GET("/users/all", role.GetAllRole)
+		sysRole.POST("/role", role.SaveRole)
+		sysRole.PUT("/role/:id", role.EditRole)
+		sysRole.DELETE("/role/:id", role.DelRole)
+
+		sysRole.GET("/roles/menu/:id", role.GetRoleMenu)
+		sysRole.PUT("/roles/auth", role.AuthRoleMenu)
+	}
+	sysUser := r.Group("")
+	{
+		sysUser.GET("/user", user.GetUserById)
+		sysUser.POST("/users/list", user.ListUser)
+		sysUser.POST("/user", user.SaveUser)
+		sysUser.PUT("/user/:id", user.EditUser)
+		sysUser.DELETE("/user/:id", user.DelUser)
+		sysUser.GET("/users/role/:userId", user.GetUserRole)
+		sysUser.PUT("/users/ban/:id", user.EnableUser)
+		sysUser.GET("/users/login/:loginName", user.GetUserByLoginName)
+		sysUser.POST("/users/now", user.NowUser)
 	}
 }

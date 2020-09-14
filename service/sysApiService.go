@@ -19,6 +19,7 @@ type ISysApiService interface {
 	ListApi(c *gin.Context, reqCond *req.ReqCond)
 	GetApiTrees(c *gin.Context)
 	GetApiTreeById(c *gin.Context, id int)
+	GetApiTree(id int) *models.SysApiTree
 }
 
 type SysApiService struct {
@@ -104,7 +105,7 @@ func (apiService *SysApiService) GetApiTree(id int) *models.SysApiTree {
 	}
 	apiTree.SysApi = *api
 	sysApis := apiService.Repo.GetApiByPid(id)
-	// 递归查询自节点
+	// 递归查询子节点
 	for child := range sysApis {
 		apiTree.Children = append(apiTree.Children, *apiService.GetApiTree(int(sysApis[child].ApiId)))
 	}

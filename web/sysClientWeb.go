@@ -7,6 +7,7 @@ import (
 	"github.com/PGshen/june/common/returncode/bcode"
 	"github.com/PGshen/june/common/returncode/ecode"
 	"github.com/PGshen/june/models"
+	"github.com/PGshen/june/models/vo"
 	"github.com/PGshen/june/service"
 	"github.com/astaxie/beego/validation"
 	"github.com/gin-gonic/gin"
@@ -87,5 +88,66 @@ func (clientWeb *SysClientWeb) ListClient(c *gin.Context) {
 		resp.RespB406(c, bcode.Client, ecode.P0317, nil)
 	} else {
 		clientWeb.ClientService.ListClient(c, &reqCond)
+	}
+}
+
+// [客户端]获取客户端绑定的IP
+func (clientWeb *SysClientWeb) GetClientIp(c *gin.Context) {
+	id, _ := strconv.Atoi(c.Param("id"))
+	valid := validation.Validation{}
+	valid.Min(id, 1, "id").Message("ID必须大于0")
+	if !valid.HasErrors() {
+		clientWeb.ClientService.GetClientIp(c, int32(id))
+	} else {
+		var errMsg = ""
+		for _, err := range valid.Errors {
+			clientWeb.Log.Info("err.key: %s, err.message: %s", err.Key, err.Message)
+			errMsg += err.Message
+		}
+		resp.RespB406s(c, bcode.Client, ecode.P0308, errMsg, nil)
+	}
+}
+
+// [客户端]保存客户端绑定IP
+func (clientWeb *SysClientWeb) SaveClientIp(c *gin.Context) {
+	clientApiVo := vo.SysClientApiVo{}
+	err := c.BindJSON(&clientApiVo)
+	if err != nil {
+		resp.RespB406(c, bcode.Client, ecode.P0317, nil)
+	} else {
+		clientWeb.ClientService.SaveClientIp(c, clientApiVo.ClientId, clientApiVo.Ip)
+	}
+}
+
+// [客户端]删除客户端绑定IP
+func (clientWeb *SysClientWeb) DelClientIp(c *gin.Context) {
+	clientApiVo := vo.SysClientApiVo{}
+	err := c.BindJSON(&clientApiVo)
+	if err != nil {
+		resp.RespB406(c, bcode.Client, ecode.P0317, nil)
+	} else {
+		clientWeb.ClientService.DelClientIp(c, clientApiVo.ClientId, clientApiVo.Ip)
+	}
+}
+
+// [客户端]获取客户端关联的API
+func (clientWeb *SysClientWeb) GetClientIpApi(c *gin.Context) {
+	clientApiVo := vo.SysClientApiVo{}
+	err := c.BindJSON(&clientApiVo)
+	if err != nil {
+		resp.RespB406(c, bcode.Client, ecode.P0317, nil)
+	} else {
+		clientWeb.ClientService.GetClientIpApi(c, clientApiVo.ClientId, clientApiVo.Ip)
+	}
+}
+
+// [客户端]客户端IP关联的API(更新方式)
+func (clientWeb *SysClientWeb) AuthClientIpApi(c *gin.Context) {
+	clientApiVo := vo.SysClientApiVo{}
+	err := c.BindJSON(&clientApiVo)
+	if err != nil {
+		resp.RespB406(c, bcode.Client, ecode.P0317, nil)
+	} else {
+		clientWeb.ClientService.AuthClientIpApi(c, clientApiVo.ClientId, clientApiVo.Ip, clientApiVo.AppId)
 	}
 }

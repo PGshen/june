@@ -12,6 +12,7 @@ type ISysApiRepo interface {
 	DeleteApi(id int) bool
 	ListApi(page int32, size int32, total *int32, where interface{}) []*models.SysApi
 	GetApiByPid(pid int) []*models.SysApi
+	GetApiByUserId(userId int32) []*models.SysApi
 }
 
 // 依赖注入
@@ -75,6 +76,15 @@ func (apiRepo *SysApiRepo) ListApi(page int32, size int32, total *int32, where i
 	var apis []*models.SysApi
 	if err := apiRepo.BaseRepo.GetPages(&models.SysApi{}, &apis, page, size, total, where); err != nil {
 		apiRepo.Log.Error("获取API列表失败：", err)
+	}
+	return apis
+}
+
+func (apiRepo *SysApiRepo) GetApiByUserId(userId int32) []*models.SysApi {
+	var apis []*models.SysApi
+	err := apiRepo.BaseRepo.Source.DB().Raw("SELECT distinct a.* from t_sys_user_role ur, t_sys_role_menu rm, t_sys_menu_api ma, t_sys_api a where a.is_del = 0 AND ur.role_id = rm.role_id AND rm.menu_id = ma.menu_id AND ur.user_id = ?", userId).Find(&apis).Error
+	if err != nil {
+		apiRepo.Log.Errorf("查询数据失败", err)
 	}
 	return apis
 }
