@@ -63,7 +63,7 @@ func (repo *SysMenuRepo) DeleteMenu(id int32) bool {
 
 func (repo *SysMenuRepo) ListMenu(page, size int32, total *int32, where interface{}) []*models.SysMenu {
 	var menus []*models.SysMenu
-	if err := repo.BaseRepo.GetPages(&models.SysMenu{}, &menus, page, size, total, where); err != nil {
+	if err := repo.BaseRepo.GetPages(&models.SysMenu{}, &menus, page, size, total, where).Error; err != nil {
 		repo.Log.Errorf("获取菜单列表失败", err)
 	}
 	return menus
@@ -80,8 +80,7 @@ func (repo *SysMenuRepo) GetMenuByRoleId(roleId int32) []*models.SysMenu {
 
 func (repo *SysMenuRepo) GetMenuIdByRoleId(roleId int32) []int32 {
 	var menuIds []int32
-	where := map[string]int32{"role_id": roleId}
-	if err := repo.BaseRepo.Source.DB().Table("t_sys_role_menu").Find(&where, &menuIds, "menu_id"); err != nil {
+	if err := repo.BaseRepo.Source.DB().Table("t_sys_role_menu").Where("role_id = ?", roleId).Pluck("menu_id", &menuIds).Error; err != nil {
 		repo.Log.Errorf("查询数据失败", err)
 	}
 	return menuIds
@@ -121,15 +120,14 @@ func (repo *SysMenuRepo) GetMenuPermByUserId(userId int32) []string {
 
 func (repo *SysMenuRepo) GetMenusByPid(pid int32) []*models.SysMenu {
 	var menus []*models.SysMenu
-	where := &models.SysMenu{ParentMenuId: pid}
-	if err := repo.BaseRepo.Source.DB().Where(where).Find(&menus); err != nil {
+	if err := repo.BaseRepo.Source.DB().Where("parent_menu_id = ?", pid).Find(&menus).Error; err != nil {
 		repo.Log.Errorf("查询数据失败", err)
 	}
 	return menus
 }
 
 func (repo *SysMenuRepo) SaveMenuApi(menuId int32, apiId int32) bool {
-	if err := repo.BaseRepo.Source.DB().Exec("insert into t_sys_menu_api(menu_id, app_id) values (?, ?)", menuId, apiId).Error; err != nil {
+	if err := repo.BaseRepo.Source.DB().Exec("insert into t_sys_menu_api(menu_id, api_id) values (?, ?)", menuId, apiId).Error; err != nil {
 		repo.Log.Errorf("写入数据失败", err)
 		return false
 	}
@@ -146,8 +144,7 @@ func (repo *SysMenuRepo) DelMenuApi(menuId int32) bool {
 
 func (repo *SysMenuRepo) GetApiIdByMenuId(menuId int32) []int32 {
 	var apiIds []int32
-	where := map[string]int32{"menu_id": menuId}
-	if err := repo.BaseRepo.Find(&where, &apiIds, "menu_id"); err != nil {
+	if err := repo.BaseRepo.Source.DB().Table("t_sys_menu_api").Where("menu_id = ?", menuId).Pluck("api_id", &apiIds).Error; err != nil {
 		repo.Log.Errorf("查询数据失败", err)
 	}
 	return apiIds

@@ -64,7 +64,7 @@ func Configure(r *gin.Engine) {
 	sysApi := r.Group("")
 	{
 		sysApi.GET("/api", api.GetApiById)
-		sysApi.POST("/apis", api.ListApi)
+		sysApi.POST("/apis/list", api.ListApi)
 		sysApi.POST("/api", api.SaveApi)
 		sysApi.PUT("/api/:id", api.EditApi)
 		sysApi.DELETE("/api/:id", api.DelApi)
@@ -104,7 +104,7 @@ func Configure(r *gin.Engine) {
 	{
 		sysRole.GET("/role", role.GetRoleById)
 		sysRole.POST("/roles/list", role.ListRole)
-		sysRole.GET("/users/all", role.GetAllRole)
+		sysRole.GET("/roles/all", role.GetAllRole)
 		sysRole.POST("/role", role.SaveRole)
 		sysRole.PUT("/role/:id", role.EditRole)
 		sysRole.DELETE("/role/:id", role.DelRole)
@@ -119,7 +119,8 @@ func Configure(r *gin.Engine) {
 		sysUser.POST("/user", user.SaveUser)
 		sysUser.PUT("/user/:id", user.EditUser)
 		sysUser.DELETE("/user/:id", user.DelUser)
-		sysUser.GET("/users/role/:userId", user.GetUserRole)
+
+		sysUser.GET("/users/role/:id", user.GetUserRole)
 		sysUser.PUT("/users/ban/:id", user.EnableUser)
 		sysUser.GET("/users/login/:loginName", user.GetUserByLoginName)
 		sysUser.POST("/users/now", user.NowUser)

@@ -29,7 +29,7 @@ type SysApiService struct {
 
 // 获取API
 func (apiService *SysApiService) GetApi(c *gin.Context, id int) {
-	apiService.Log.Info("Get api: id = %s", id)
+	apiService.Log.Infof("Get api: id = %s", id)
 	data := apiService.Repo.GetApiById(id)
 	if data == nil {
 		resp.RespB406s(c, bcode.Api, ecode.P0301, "", nil)

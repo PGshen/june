@@ -86,7 +86,7 @@ func (service *SysClientService) GetClientIp(c *gin.Context, id int32) {
 func (service *SysClientService) SaveClientIp(c *gin.Context, clientId int32, ip string) {
 	// todo 检查IP是否已存在了
 	// 绑定IP是默认填个apiId为0的以占位
-	var apiIds = []int32{0}
+	var apiIds []int32
 	service.AuthClientIpApi(c, clientId, ip, apiIds)
 }
 
@@ -103,12 +103,12 @@ func (service *SysClientService) GetClientIpApi(c *gin.Context, clientId int32, 
 	var apis []*models.SysApi
 	apiIds := service.Repo.GetClientIpApi(clientId, ip)
 	// get API by apiId
-	for apiId := range apiIds {
-		api := service.ApiRepo.GetApiById(apiId)
+	for e := range apiIds {
+		api := service.ApiRepo.GetApiById(int(apiIds[e]))
 		if api != nil {
 			apis = append(apis, api)
 		} else {
-			service.Log.Warnf("未找到对应API， apiId = %s", apiId)
+			service.Log.Warnf("未找到对应API， apiId = %s", apiIds[e])
 		}
 	}
 	resp.RespB200(c, bcode.Client, apis)
@@ -123,8 +123,8 @@ func (service *SysClientService) AuthClientIpApi(c *gin.Context, clientId int32,
 // 客户端关联API
 func (service *SysClientService) associateClientIpApi(clientId int32, ip string, apiIds []int32) {
 	apiIds = append(apiIds, 0)
-	for apiId := range apiIds {
-		service.Repo.SaveClientIpApi(clientId, ip, int32(apiId))
+	for e := range apiIds {
+		service.Repo.SaveClientIpApi(clientId, ip, int32(apiIds[e]))
 	}
 }
 

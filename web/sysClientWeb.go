@@ -148,6 +148,6 @@ func (clientWeb *SysClientWeb) AuthClientIpApi(c *gin.Context) {
 	if err != nil {
 		resp.RespB406(c, bcode.Client, ecode.P0317, nil)
 	} else {
-		clientWeb.ClientService.AuthClientIpApi(c, clientApiVo.ClientId, clientApiVo.Ip, clientApiVo.AppId)
+		clientWeb.ClientService.AuthClientIpApi(c, clientApiVo.ClientId, clientApiVo.Ip, clientApiVo.ApiIds)
 	}
 }

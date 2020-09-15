@@ -163,10 +163,15 @@ func (service *SysMenuService) GetUserMenuPerm(c *gin.Context, userId int32) {
 func (service *SysMenuService) GetMenuApiById(c *gin.Context, menuId int32) {
 	var menuApiVo vo.SysMenuApiVo
 	apiTree := service.ApiService.GetApiTree(1)
+	// todo 深克隆，查询优化
+	apiTree2 := service.ApiService.GetApiTree(1)
+	//apiTree2 := &models.SysApiTree{}
+	//_ = deepcopier.Copy(apiTree).To(apiTree2)
 	apiTrees := []models.SysApiTree{*apiTree}
+	apiTrees2 := []models.SysApiTree{*apiTree2}
 	menuApiIds := service.Repo.GetApiIdByMenuId(menuId)
 	fromData := service.cutApiTree(false, apiTrees, menuApiIds)
-	toData := service.cutApiTree(true, apiTrees, menuApiIds)
+	toData := service.cutApiTree(true, apiTrees2, menuApiIds)
 	menuApiVo.FromData = fromData
 	menuApiVo.ToData = toData
 	resp.RespB200(c, bcode.Menu, menuApiVo)
@@ -181,16 +186,24 @@ func (service *SysMenuService) cutApiTree(flag bool, trees []models.SysApiTree, 
 	}
 	if flag {
 		for i := 0; i < len(trees); {
-			if len(trees[i].Children) == 0 && !contains(menuApiIds, trees[i].ApiId) {
-				trees = append(trees[:i], trees[i+1])
+			if (trees[i].Children == nil || len(trees[i].Children) == 0) && !contains(menuApiIds, trees[i].ApiId) {
+				if i == len(trees)-1 {
+					trees = trees[:i]
+				} else {
+					trees = append(trees[:i], trees[i+1])
+				}
 			} else {
 				i++
 			}
 		}
 	} else {
 		for i := 0; i < len(trees); {
-			if len(trees[i].Children) == 0 && contains(menuApiIds, trees[i].ApiId) {
-				trees = append(trees[:i], trees[i+1])
+			if (trees[i].Children == nil || len(trees[i].Children) == 0) && contains(menuApiIds, trees[i].ApiId) {
+				if i == len(trees)-1 {
+					trees = trees[:i]
+				} else {
+					trees = append(trees[:i], trees[i+1])
+				}
 			} else {
 				i++
 			}
@@ -208,9 +221,9 @@ func (service *SysMenuService) AuthMenuApi(c *gin.Context, ma vo.MenuAuth) {
 	resp.RespB200(c, bcode.Menu, true)
 }
 
-func (service *SysMenuService) associateMenuApi(menuId int32, appIds []int32) {
-	for apiId := range appIds {
-		service.Repo.SaveMenuApi(menuId, int32(apiId))
+func (service *SysMenuService) associateMenuApi(menuId int32, apiIds []int32) {
+	for e := range apiIds {
+		service.Repo.SaveMenuApi(menuId, int32(apiIds[e]))
 	}
 }
 

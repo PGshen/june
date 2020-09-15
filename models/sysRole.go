@@ -1,6 +1,9 @@
 package models
 
-import "time"
+import (
+	"github.com/jinzhu/gorm"
+	"time"
+)
 
 type SysRole struct {
 	RoleId      int32     `gorm:"primary_key" json:"role_id"`
@@ -14,4 +17,15 @@ type SysRole struct {
 
 func (SysRole) TableName() string {
 	return "t_sys_role"
+}
+
+func (sysRole *SysRole) BeforeCreate(scope *gorm.Scope) error {
+	err := scope.SetColumn("CreatedTime", time.Now())
+	err = scope.SetColumn("UpdateTime", time.Now())
+	return err
+}
+
+func (sysRole *SysRole) BeforeUpdate(scope *gorm.Scope) error {
+	err := scope.SetColumn("UpdateTime", time.Now())
+	return err
 }
