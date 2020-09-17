@@ -3,6 +3,7 @@ module github.com/PGshen/june
 go 1.13
 
 require (
+	github.com/appleboy/gin-jwt/v2 v2.6.4
 	github.com/astaxie/beego v1.12.1
 	github.com/facebookgo/ensure v0.0.0-20200202191622-63f1cf65ac4c // indirect
 	github.com/facebookgo/inject v0.0.0-20180706035515-f23751cae28b
@@ -12,7 +13,6 @@ require (
 	github.com/gin-gonic/gin v1.6.3
 	github.com/go-playground/validator/v10 v10.3.0
 	github.com/jinzhu/gorm v1.9.12
-	github.com/ulule/deepcopier v0.0.0-20200430083143-45decc6639b6
 	go.uber.org/zap v1.15.0
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0
 	gopkg.in/yaml.v2 v2.3.0

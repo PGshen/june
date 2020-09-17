@@ -51,6 +51,9 @@ func RespP500(c *gin.Context, programCode pcode.ProgramCode, errorCode ecode.Err
 func RespB200(c *gin.Context, businessCode bcode.BusinessCode, data interface{}) {
 	RespBusiData(c, hcode.Ok, tcode.Business, businessCode, ecode.P0000, "", data)
 }
+func RespB200m(c *gin.Context, businessCode bcode.BusinessCode, msg string, data interface{}) {
+	RespBusiData(c, hcode.Ok, tcode.Business, businessCode, ecode.P0000, msg, data)
+}
 
 func Resp200(c *gin.Context, businessCode bcode.BusinessCode) {
 	RespBusiData(c, hcode.Ok, tcode.Business, businessCode, ecode.P0000, "", nil)

@@ -3,6 +3,7 @@ package routers
 import (
 	"github.com/PGshen/june/common/datasource"
 	"github.com/PGshen/june/common/logger"
+	"github.com/PGshen/june/common/middleware"
 	"github.com/PGshen/june/repository"
 	"github.com/PGshen/june/service"
 	"github.com/PGshen/june/web"
@@ -27,6 +28,7 @@ func Configure(r *gin.Engine) {
 	var menu web.SysMenuWeb
 	var role web.SysRoleWeb
 	var user web.SysUserWeb
+	var myjwt middleware.Jwt
 	db := datasource.Db{}
 	zap := logger.Logger{}
 	var injector inject.Graph
@@ -38,6 +40,7 @@ func Configure(r *gin.Engine) {
 		&inject.Object{Value: &user},
 		&inject.Object{Value: &db},
 		&inject.Object{Value: &zap},
+		&inject.Object{Value: &myjwt},
 		&inject.Object{Value: &repository.BaseRepo{}},
 		&inject.Object{Value: &repository.SysApiRepo{}},
 		&inject.Object{Value: &service.SysApiService{}},
@@ -61,6 +64,11 @@ func Configure(r *gin.Engine) {
 	if err := db.Connect(); err != nil {
 		log.Fatal("db fatal:", err)
 	}
+	var authMiddleware = myjwt.GinJWTMiddlewareInit(middleware.Authorizator)
+	r.NoRoute(authMiddleware.MiddlewareFunc(), middleware.NoRouteHandler)
+	r.POST("/login", authMiddleware.LoginHandler)
+	r.GET("/refresh_token", authMiddleware.RefreshHandler)
+	r.Use(authMiddleware.MiddlewareFunc())
 	sysApi := r.Group("")
 	{
 		sysApi.GET("/api", api.GetApiById)

@@ -18,6 +18,7 @@ type SysUser struct {
 	IsDel       int       `json:"is_del"`
 	CreatedTime time.Time `json:"created_time"`
 	UpdateTime  time.Time `json:"update_time"`
+	Roles       []int32   `sql:"-" json:"roles"`
 }
 
 func (SysUser) TableName() string {
@@ -25,11 +26,12 @@ func (SysUser) TableName() string {
 }
 
 func (sysUser *SysUser) BeforeCreate(scope *gorm.Scope) error {
-	err := scope.SetColumn("CreatedTime", time.Now().Unix())
+	err := scope.SetColumn("CreatedTime", time.Now())
+	err = scope.SetColumn("UpdateTime", time.Now())
 	return err
 }
 
 func (sysUser *SysUser) BeforeUpdate(scope *gorm.Scope) error {
-	err := scope.SetColumn("UpdateTime", time.Now().Unix())
+	err := scope.SetColumn("UpdateTime", time.Now())
 	return err
 }
