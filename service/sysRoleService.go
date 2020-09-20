@@ -73,7 +73,10 @@ func (service *SysRoleService) ListRole(c *gin.Context, reqCond *req.ReqCond) {
 	var total int32
 	where := reqCond.Filter
 	roles := service.Repo.ListRole(page, size, &total, where)
-	resp.RespB200(c, bcode.Role, roles)
+	res := make(map[string]interface{})
+	res["records"] = roles
+	res["total"] = total
+	resp.RespB200(c, bcode.Role, res)
 }
 
 func (service *SysRoleService) AllRole(c *gin.Context) {

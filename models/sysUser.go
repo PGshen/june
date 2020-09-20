@@ -6,18 +6,18 @@ import (
 )
 
 type SysUser struct {
-	UserId      int32     `gorm:"primary_key" json:"user_id"`
-	LoginName   string    `json:"login_name"`
+	UserId      int32     `gorm:"primary_key" json:"userId"`
+	LoginName   string    `json:"loginName"`
 	Password    string    `json:"password"`
 	Name        string    `json:"name"`
 	Email       string    `json:"email"`
 	Phone       string    `json:"phone"`
 	Avatar      string    `json:"avatar"`
 	Remark      string    `json:"remark"`
-	IsEnable    int       `json:"is_enable"`
-	IsDel       int       `json:"is_del"`
-	CreatedTime time.Time `json:"created_time"`
-	UpdateTime  time.Time `json:"update_time"`
+	IsEnable    int       `json:"isEnable"`
+	IsDel       int       `json:"isDel"`
+	CreatedTime time.Time `json:"createdTime"`
+	UpdateTime  time.Time `json:"updateTime"`
 	Roles       []int32   `sql:"-" json:"roles"`
 }
 

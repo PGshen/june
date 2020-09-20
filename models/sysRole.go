@@ -6,13 +6,13 @@ import (
 )
 
 type SysRole struct {
-	RoleId      int32     `gorm:"primary_key" json:"role_id"`
-	RoleName    string    `json:"role_name"`
+	RoleId      int32     `gorm:"primary_key" json:"roleId"`
+	RoleName    string    `json:"roleName"`
 	Alias       string    `json:"alias"`
 	Description string    `json:"description"`
-	IsDel       int       `json:"is_del"`
-	CreatedTime time.Time `json:"created_time"`
-	UpdateTime  time.Time `json:"update_time"`
+	IsDel       int       `json:"isDel"`
+	CreatedTime time.Time `json:"createdTime"`
+	UpdateTime  time.Time `json:"updateTime"`
 }
 
 func (SysRole) TableName() string {

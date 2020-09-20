@@ -6,17 +6,17 @@ import (
 )
 
 type SysApi struct {
-	ApiId       int32     `gorm:"primary_key" json:"api_id"`
-	ParentApiId int32     `json:"parent_api_id"`
-	CascadePath string    `json:"cascade_path"`
+	ApiId       int32     `gorm:"primary_key" json:"apiId"`
+	ParentApiId int32     `json:"parentApiId"`
+	CascadePath string    `json:"cascadePath"`
 	Type        int       `json:"type"`
 	Name        string    `json:"name"`
 	Description string    `json:"description"`
 	Method      string    `json:"method"`
 	Uri         string    `json:"uri"`
-	IsDel       int       `json:"is_del"`
-	CreatedTime time.Time `json:"created_time"`
-	UpdateTime  time.Time `json:"update_time"`
+	IsDel       int       `json:"isDel"`
+	CreatedTime time.Time `json:"createdTime"`
+	UpdateTime  time.Time `json:"updateTime"`
 }
 
 type SysApiTree struct {

@@ -3,14 +3,14 @@ package models
 import "time"
 
 type SysOrg struct {
-	OrgId       int32     `gorm:"primary_key" json:"org_id"`
-	ParentOrgId int32     `json:"parent_org_id"`
-	OrgName     string    `json:"org_name"`
+	OrgId       int32     `gorm:"primary_key" json:"orgId"`
+	ParentOrgId int32     `json:"parentOrgId"`
+	OrgName     string    `json:"orgName"`
 	Remark      string    `json:"remark"`
-	OrderNum    int       `json:"order_num"`
-	IsDel       int       `json:"is_del"`
-	CreatedTime time.Time `json:"created_time"`
-	UpdateTime  time.Time `json:"update_time"`
+	OrderNum    int       `json:"orderNum"`
+	IsDel       int       `json:"isDel"`
+	CreatedTime time.Time `json:"createdTime"`
+	UpdateTime  time.Time `json:"updateTime"`
 }
 
 func (SysOrg) TableName() string {

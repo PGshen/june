@@ -18,6 +18,7 @@ type SysUserWeb struct {
 	Log         logger.ILogger          `inject:""`
 	UserService service.ISysUserService `inject:""`
 	RoleService service.ISysRoleService `inject:""`
+	MenuService service.ISysMenuService `inject:""`
 }
 
 // [用户]按ID获取用户
@@ -121,4 +122,18 @@ func (userWeb *SysUserWeb) NowUser(c *gin.Context) {
 	userInfoVo := jwt.ExtractClaims(c)
 	loginName := userInfoVo["loginName"].(string)
 	userWeb.UserService.GetUserByLoginName(c, loginName)
+}
+
+// 获取用户的菜单树，用于生成前端菜单路由
+func (userWeb *SysUserWeb) GetUserMenuTree(c *gin.Context) {
+	userInfoVo := jwt.ExtractClaims(c)
+	userId := int32(userInfoVo["userId"].(float64))
+	userWeb.MenuService.GetUserMenuTree(c, userId)
+}
+
+// 获取用户的权限列表，用于前端控制权限按钮等
+func (userWeb *SysUserWeb) GetUserPerm(c *gin.Context) {
+	userInfoVo := jwt.ExtractClaims(c)
+	userId := int32(userInfoVo["userId"].(float64))
+	userWeb.MenuService.GetUserMenuPerm(c, userId)
 }

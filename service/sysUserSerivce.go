@@ -62,7 +62,13 @@ func (service *SysUserService) SaveUser(c *gin.Context, user *models.SysUser) {
 func (service *SysUserService) UpdateUser(c *gin.Context, user *models.SysUser) {
 	service.Log.Infof("Update user: user = %s", user)
 	if service.Repo.UpdateUser(user) {
-		resp.RespB200(c, bcode.User, user)
+		// 保存角色信息
+		roleIds := user.Roles
+		var userAuth = vo.UserAuth{
+			UserId:  user.UserId,
+			RoleIds: roleIds,
+		}
+		service.AuthUserRole(c, userAuth)
 	} else {
 		resp.RespB406(c, bcode.User, ecode.P0312, nil)
 	}
@@ -85,7 +91,10 @@ func (service *SysUserService) ListUser(c *gin.Context, reqCond *req.ReqCond) {
 	var total int32
 	where := reqCond.Filter
 	users := service.Repo.ListUser(page, size, &total, where)
-	resp.RespB200(c, bcode.User, users)
+	res := make(map[string]interface{})
+	res["records"] = users
+	res["total"] = total
+	resp.RespB200(c, bcode.User, res)
 }
 
 func (service *SysUserService) GetUserInfoByLoginName(loginName string) vo.UserInfoVo {
@@ -167,5 +176,5 @@ func (service *SysUserService) associateUserRole(userId int32, roleIds []int32) 
 }
 
 func (service *SysUserService) disassociateUserRole(userId int32) {
-	service.Repo.DeleteUser(userId)
+	service.Repo.DelUserRole(userId)
 }

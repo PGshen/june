@@ -20,7 +20,7 @@ type ISysMenuService interface {
 	ListMenu(c *gin.Context, reqCond *req.ReqCond)
 	GetMenuByRoleId(c *gin.Context, roleId int32)
 	GetMenuIdByRoleId(c *gin.Context, roleId int32)
-	GetMenuTreeById(c *gin.Context, menuId int32)
+	GetMenuTreeById(c *gin.Context, menuId int32, isAll bool)
 	GetUserMenuTree(c *gin.Context, userId int32)
 	GetUserMenuPerm(c *gin.Context, userId int32)
 	GetMenuApiById(c *gin.Context, menuId int32)
@@ -78,7 +78,10 @@ func (service *SysMenuService) ListMenu(c *gin.Context, reqCond *req.ReqCond) {
 	var total int32
 	where := reqCond.Filter
 	menus := service.Repo.ListMenu(page, size, &total, where)
-	resp.RespB200(c, bcode.Menu, menus)
+	res := make(map[string]interface{})
+	res["records"] = menus
+	res["total"] = total
+	resp.RespB200(c, bcode.Menu, res)
 }
 
 // 获取角色关联的菜单列表
@@ -95,13 +98,18 @@ func (service *SysMenuService) GetMenuIdByRoleId(c *gin.Context, roleId int32) {
 }
 
 // 获取菜单树
-func (service *SysMenuService) GetMenuTreeById(c *gin.Context, menuId int32) {
+func (service *SysMenuService) GetMenuTreeById(c *gin.Context, menuId int32, isAll bool) {
 	service.Log.Infof("Get menu tree by id, id = %s", menuId)
 	menuTree := service.getMenuTree(menuId)
 	if menuTree == nil {
 		resp.RespB406(c, bcode.Menu, ecode.P0301, nil)
 	} else {
-		resp.RespB200(c, bcode.Menu, menuTree)
+		if isAll {
+			res := []models.SysMenuTree{*menuTree}
+			resp.RespB200(c, bcode.Menu, res)
+		} else {
+			resp.RespB200(c, bcode.Menu, menuTree)
+		}
 	}
 }
 
@@ -131,24 +139,33 @@ func (service *SysMenuService) GetUserMenuTree(c *gin.Context, userId int32) {
 
 // 裁剪菜单树，使其仅保留当前角色所关联的菜单
 func (service *SysMenuService) cutOutMenuTree(menuTrees []models.SysMenuTree, menuIds []int32) []models.SysMenuTree {
-	// 移除按钮类型
-	for i := 0; i < len(menuTrees); {
-		if menuTrees[i].Type == 2 {
-			menuTrees = append(menuTrees[:i], menuTrees[i+1])
-		} else {
-			i++
-		}
+
+	for i := 0; i < len(menuTrees); i++ {
+		menuTrees[i].Children = service.cutOutMenuTree(menuTrees[i].Children, menuIds)
 	}
 	// 移除不在menuIds的
 	for i := 0; i < len(menuTrees); {
-		if !contains(menuIds, menuTrees[i].MenuId) {
-			menuTrees = append(menuTrees[:i], menuTrees[i+1])
+		if (menuTrees[i].Children == nil || len(menuTrees[i].Children) == 0) && !contains(menuIds, menuTrees[i].MenuId) {
+			if i == len(menuTrees)-1 {
+				menuTrees = menuTrees[:i]
+			} else {
+				menuTrees = append(menuTrees[:i], menuTrees[i+1])
+			}
 		} else {
 			i++
 		}
 	}
-	for i := 0; i < len(menuTrees); i++ {
-		menuTrees[i].Children = service.cutOutMenuTree(menuTrees[i].Children, menuIds)
+	// 移除按钮类型
+	for i := 0; i < len(menuTrees); {
+		if (menuTrees[i].Children == nil || len(menuTrees[i].Children) == 0) && menuTrees[i].Type == 2 {
+			if i == len(menuTrees)-1 {
+				menuTrees = menuTrees[:i]
+			} else {
+				menuTrees = append(menuTrees[:i], menuTrees[i+1])
+			}
+		} else {
+			i++
+		}
 	}
 	return menuTrees
 }

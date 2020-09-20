@@ -69,17 +69,17 @@ func Configure(r *gin.Engine) {
 	r.POST("/login", authMiddleware.LoginHandler)
 	r.GET("/refresh_token", authMiddleware.RefreshHandler)
 	r.Use(authMiddleware.MiddlewareFunc())
-	sysApi := r.Group("")
+	sysApi := r.Group("/admin")
 	{
 		sysApi.GET("/api", api.GetApiById)
 		sysApi.POST("/apis/list", api.ListApi)
 		sysApi.POST("/api", api.SaveApi)
 		sysApi.PUT("/api/:id", api.EditApi)
 		sysApi.DELETE("/api/:id", api.DelApi)
-		sysApi.GET("/api/tree", api.ApiTree)
-		sysApi.GET("/api/tree/:id", api.ApiTreeById)
+		sysApi.GET("/apis/tree", api.ApiTree)
+		sysApi.GET("/apis/tree/:id", api.ApiTreeById)
 	}
-	sysClient := r.Group("")
+	sysClient := r.Group("/admin")
 	{
 		sysClient.GET("/client", client.GetClientById)
 		sysClient.POST("/clients/list", client.ListClient)
@@ -94,7 +94,7 @@ func Configure(r *gin.Engine) {
 		sysClient.POST("/clients/ips/apis/list", client.GetClientIpApi)
 		sysClient.POST("/clients/ips/api", client.AuthClientIpApi)
 	}
-	sysMenu := r.Group("")
+	sysMenu := r.Group("/admin")
 	{
 		sysMenu.GET("/menu", menu.GetMenuById)
 		sysMenu.POST("/menus/list", menu.ListMenu)
@@ -108,7 +108,7 @@ func Configure(r *gin.Engine) {
 		sysMenu.GET("/menus/api/:id", menu.GetMenuApiById)
 		sysMenu.PUT("/menus/api", menu.AuthMenuApi)
 	}
-	sysRole := r.Group("")
+	sysRole := r.Group("/admin")
 	{
 		sysRole.GET("/role", role.GetRoleById)
 		sysRole.POST("/roles/list", role.ListRole)
@@ -120,7 +120,7 @@ func Configure(r *gin.Engine) {
 		sysRole.GET("/roles/menu/:id", role.GetRoleMenu)
 		sysRole.PUT("/roles/auth", role.AuthRoleMenu)
 	}
-	sysUser := r.Group("")
+	sysUser := r.Group("/admin")
 	{
 		sysUser.GET("/user", user.GetUserById)
 		sysUser.POST("/users/list", user.ListUser)
@@ -132,5 +132,7 @@ func Configure(r *gin.Engine) {
 		sysUser.PUT("/users/ban/:id", user.EnableUser)
 		sysUser.GET("/users/login/:loginName", user.GetUserByLoginName)
 		sysUser.POST("/users/now", user.NowUser)
+		sysUser.GET("/users/route", user.GetUserMenuTree)
+		sysUser.GET("/users/perm", user.GetUserPerm)
 	}
 }

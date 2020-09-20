@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"encoding/base64"
 	"github.com/PGshen/june/common/resp"
 	"github.com/PGshen/june/common/returncode/bcode"
 	"github.com/PGshen/june/common/returncode/ecode"
@@ -35,7 +36,7 @@ func (j *Jwt) GinJWTMiddlewareInit(jwtAuthorizator JwtAuthorizator) (authMiddlew
 	authMiddleware, err := jwt.New(&jwt.GinJWTMiddleware{
 		Realm:       "test zone",
 		Key:         []byte("secret key"),
-		Timeout:     time.Minute * 30,
+		Timeout:     time.Minute * 60,
 		MaxRefresh:  time.Hour,
 		IdentityKey: app.IdentityKey,
 		PayloadFunc: func(data interface{}) jwt.MapClaims {
@@ -71,9 +72,15 @@ func (j *Jwt) GinJWTMiddlewareInit(jwtAuthorizator JwtAuthorizator) (authMiddlew
 			if err := c.ShouldBind(&user); err != nil {
 				return "", jwt.ErrMissingLoginValues
 			}
-			loginName := user.LoginName
-			password := user.Password
-			if j.UserService.CheckUser(loginName, password) {
+			//loginName := user.LoginName
+			//password := user.Password
+			loginName := c.Query("username")
+			password := c.Query("password")
+			// 对password解密
+			pwd, _ := base64.StdEncoding.DecodeString(password)
+			realPwd := utils.AES_CBC_Decrypt(pwd, []byte(app.AesKey))
+			// md5加密
+			if j.UserService.CheckUser(loginName, utils.MD5_ENCRYPT(realPwd)) {
 				userInfo := j.UserService.GetUserInfoByLoginName(loginName)
 				userId := userInfo.User.UserId
 				roles := userInfo.Roles

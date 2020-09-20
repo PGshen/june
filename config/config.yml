@@ -9,12 +9,13 @@ app:
   page-size: 10
   log-path: log
   identity-key: idname
+  aes-key: 1234567887654321
 
 database:
   type: mysql
   user: root
-  password: One_123456
-  host: 127.0.0.1:3306
+  password: 123456
+  host: 14.215.47.163:3306
   name: june
 #  table-prefix: t_
 

@@ -88,7 +88,7 @@ func (repo *SysMenuRepo) GetMenuIdByRoleId(roleId int32) []int32 {
 
 func (repo *SysMenuRepo) GetMenuIdByUserId(userId int32) []int32 {
 	var menuIds []int32
-	rows, err := repo.BaseRepo.Source.DB().Raw("select distinct rm.menu_id from t_sys_user_role ur, t_sys_role_menu rm where ur.role_id = rm.role_id and m.is_del = 0 and ur.user_id = ?", userId).Rows()
+	rows, err := repo.BaseRepo.Source.DB().Raw("select distinct rm.menu_id from t_sys_user_role ur, t_sys_role_menu rm where ur.role_id = rm.role_id and ur.user_id = ?", userId).Rows()
 	if err != nil {
 		repo.Log.Errorf("查询数据失败", err)
 		return menuIds

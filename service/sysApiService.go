@@ -76,13 +76,22 @@ func (apiService *SysApiService) ListApi(c *gin.Context, reqCond *req.ReqCond) {
 	var total int32
 	where := reqCond.Filter
 	apis := apiService.Repo.ListApi(page, size, &total, where)
-	resp.RespB200(c, bcode.Api, apis)
+	res := make(map[string]interface{})
+	res["records"] = apis
+	res["total"] = total
+	resp.RespB200(c, bcode.Api, res)
 }
 
 // 完整API树
 func (apiService *SysApiService) GetApiTrees(c *gin.Context) {
 	apiService.Log.Info("Get api tree")
-	apiService.GetApiTreeById(c, 1)
+	apiTree := apiService.GetApiTree(1)
+	if apiTree == nil {
+		resp.RespB406(c, bcode.Api, ecode.P0301, nil)
+	} else {
+		res := []models.SysApiTree{*apiTree}
+		resp.RespB200(c, bcode.Api, res)
+	}
 }
 
 // 指定ID的API树

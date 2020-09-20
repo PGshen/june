@@ -6,23 +6,23 @@ import (
 )
 
 type SysMenu struct {
-	MenuId       int32     `gorm:"primary_key" json:"menu_id"`
-	ParentMenuId int32     `json:"parent_menu_id"`
-	CascadePath  string    `json:"cascade_path"`
-	MenuName     string    `json:"menu_name"`
+	MenuId       int32     `gorm:"primary_key" json:"menuId"`
+	ParentMenuId int32     `json:"parentMenuId"`
+	CascadePath  string    `json:"cascadePath"`
+	MenuName     string    `json:"menuName"`
 	Title        string    `json:"title"`
 	Icon         string    `json:"icon"`
 	Perm         string    `json:"perm"`
 	Type         int       `json:"type"`
-	OrderNum     int       `json:"order_num"`
+	OrderNum     int       `json:"orderNum"`
 	Hidden       int       `json:"hidden"`
-	AlwaysShow   int       `json:"always_show"`
+	AlwaysShow   int       `json:"alwaysShow"`
 	Component    string    `json:"component"`
 	Path         string    `json:"path"`
 	Redirect     string    `json:"redirect"`
-	IsDel        int       `json:"is_del"`
-	CreatedTime  time.Time `json:"created_time"`
-	UpdateTime   time.Time `json:"update_time"`
+	IsDel        int       `json:"isDel"`
+	CreatedTime  time.Time `json:"createdTime"`
+	UpdateTime   time.Time `json:"updateTime"`
 }
 
 type SysMenuTree struct {

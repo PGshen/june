@@ -3,6 +3,7 @@ package repository
 import (
 	"github.com/PGshen/june/common/datasource"
 	"github.com/PGshen/june/common/logger"
+	"github.com/PGshen/june/common/utils"
 	"github.com/jinzhu/gorm"
 )
 
@@ -89,7 +90,11 @@ func (b *BaseRepo) Find(where interface{}, out interface{}, sel string, orders .
 // GetPages 分页返回数据
 func (b *BaseRepo) GetPages(model interface{}, out interface{}, pageIndex int32, pageSize int32, totalCount *int32, where interface{}, orders ...string) error {
 	db := b.Source.DB().Model(model).Where(model)
-	db = db.Where(where)
+	where_ := make(map[string]interface{})
+	for k, v := range where.(map[string]interface{}) {
+		where_[utils.Camel2Case(k)] = v
+	}
+	db = db.Where(where_)
 	if len(orders) > 0 {
 		for _, order := range orders {
 			db = db.Order(order)

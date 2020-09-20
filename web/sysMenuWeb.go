@@ -94,12 +94,12 @@ func (menuWeb *SysMenuWeb) ListMenu(c *gin.Context) {
 // [菜单]按ID获取菜单树
 func (menuWeb *SysMenuWeb) GetMenuTreeById(c *gin.Context) {
 	id, _ := strconv.Atoi(c.Param("id"))
-	menuWeb.MenuService.GetMenuTreeById(c, int32(id))
+	menuWeb.MenuService.GetMenuTreeById(c, int32(id), false)
 }
 
 // [菜单]获取完整菜单树
 func (menuWeb *SysMenuWeb) GetMenuTree(c *gin.Context) {
-	menuWeb.MenuService.GetMenuTreeById(c, 0)
+	menuWeb.MenuService.GetMenuTreeById(c, 0, true)
 }
 
 // [菜单]获取菜单关联的API

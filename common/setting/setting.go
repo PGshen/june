@@ -30,6 +30,7 @@ type App struct {
 	PageSize    int    `yaml:"page-size"`
 	IdentityKey string `yaml:"identity-key"`
 	LogPath     string `yaml:"log-path"`
+	AesKey      string `yaml:"aes-key"`
 }
 
 type Database struct {

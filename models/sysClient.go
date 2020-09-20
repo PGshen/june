@@ -6,20 +6,20 @@ import (
 )
 
 type SysClient struct {
-	ClientId              int32  `gorm:"primary_key" json:"client_id"`
-	AppId                 string `json:"app_id"`
-	AppSecret             string `json:"app_secret"`
+	ClientId              int32  `gorm:"primary_key" json:"clientId"`
+	AppId                 string `json:"appId"`
+	AppSecret             string `json:"appSecret"`
 	Description           string `json:"description"`
-	ResourceIds           string `json:"resource_ids"`
+	ResourceIds           string `json:"resourceIds"`
 	Scope                 string `json:"scope"`
-	AuthorizedGrantTypes  string `json:"authorized_grant_types"`
-	WebServerRedirectUri  string `json:"web_server_redirect_uri"`
+	AuthorizedGrantTypes  string `json:"authorizedGrantTypes"`
+	WebServerRedirectUri  string `json:"webServerRedirectUri"`
 	Authorities           string `json:"authorities"`
-	AccessTokenValidity   int32  `json:"access_token_validity"`
-	RefreshTokenValidity  int32  `json:"refresh_token_validity"`
-	AdditionalInformation string `json:"additional_information"`
+	AccessTokenValidity   int32  `json:"accessTokenValidity"`
+	RefreshTokenValidity  int32  `json:"refreshTokenValidity"`
+	AdditionalInformation string `json:"additionalInformation"`
 	Autoapprove           string `json:"autoapprove"`
-	IsDel                 int    `json:"is_del"`
+	IsDel                 int    `json:"isDel"`
 
 	CreatedTime time.Time `json:"created_time"`
 	UpdateTime  time.Time `json:"modified_time"`

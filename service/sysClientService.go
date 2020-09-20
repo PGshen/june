@@ -74,7 +74,10 @@ func (service *SysClientService) ListClient(c *gin.Context, reqCond *req.ReqCond
 	var total int32
 	where := reqCond.Filter
 	clients := service.Repo.ListClient(page, size, &total, where)
-	resp.RespB200(c, bcode.Client, clients)
+	res := make(map[string]interface{})
+	res["records"] = clients
+	res["total"] = total
+	resp.RespB200(c, bcode.Client, res)
 }
 
 func (service *SysClientService) GetClientIp(c *gin.Context, id int32) {
