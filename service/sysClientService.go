@@ -6,7 +6,9 @@ import (
 	"github.com/PGshen/june/common/resp"
 	"github.com/PGshen/june/common/returncode/bcode"
 	"github.com/PGshen/june/common/returncode/ecode"
+	"github.com/PGshen/june/common/utils"
 	"github.com/PGshen/june/models"
+	"github.com/PGshen/june/models/vo"
 	"github.com/PGshen/june/repository"
 	"github.com/gin-gonic/gin"
 )
@@ -25,9 +27,10 @@ type ISysClientService interface {
 }
 
 type SysClientService struct {
-	Repo    repository.ISysClientRepo `inject:""`
-	ApiRepo repository.ISysApiRepo    `inject:""`
-	Log     logger.ILogger            `inject:""`
+	Repo       repository.ISysClientRepo `inject:""`
+	ApiRepo    repository.ISysApiRepo    `inject:""`
+	ApiService ISysApiService            `inject:""`
+	Log        logger.ILogger            `inject:""`
 }
 
 func (service *SysClientService) GetClient(c *gin.Context, id int32) {
@@ -72,7 +75,7 @@ func (service *SysClientService) ListClient(c *gin.Context, reqCond *req.ReqCond
 	page := reqCond.Page
 	size := reqCond.Size
 	var total int32
-	where := reqCond.Filter
+	where := utils.GetFilter(reqCond.Filter)
 	clients := service.Repo.ListClient(page, size, &total, where)
 	res := make(map[string]interface{})
 	res["records"] = clients
@@ -82,8 +85,12 @@ func (service *SysClientService) ListClient(c *gin.Context, reqCond *req.ReqCond
 
 func (service *SysClientService) GetClientIp(c *gin.Context, id int32) {
 	service.Log.Infof("Get client's ip, clientId = %s", id)
+	var ipsvo []vo.SysClientIpVo
 	ips := service.Repo.GetClientIp(id)
-	resp.RespB200(c, bcode.Client, ips)
+	for e := range ips {
+		ipsvo = append(ipsvo, vo.SysClientIpVo{Ip: ips[e]})
+	}
+	resp.RespB200(c, bcode.Client, ipsvo)
 }
 
 func (service *SysClientService) SaveClientIp(c *gin.Context, clientId int32, ip string) {
@@ -103,18 +110,20 @@ func (service *SysClientService) DelClientIp(c *gin.Context, clientId int32, ip 
 }
 
 func (service *SysClientService) GetClientIpApi(c *gin.Context, clientId int32, ip string) {
-	var apis []*models.SysApi
 	apiIds := service.Repo.GetClientIpApi(clientId, ip)
-	// get API by apiId
-	for e := range apiIds {
-		api := service.ApiRepo.GetApiById(int(apiIds[e]))
-		if api != nil {
-			apis = append(apis, api)
-		} else {
-			service.Log.Warnf("未找到对应API， apiId = %s", apiIds[e])
-		}
-	}
-	resp.RespB200(c, bcode.Client, apis)
+	var apiVo vo.SysApiVo
+	apiTree := service.ApiService.GetApiTree(1)
+	// todo 深克隆，查询优化
+	apiTree2 := service.ApiService.GetApiTree(1)
+	//apiTree2 := &models.SysApiTree{}
+	//_ = deepcopier.Copy(apiTree).To(apiTree2)
+	apiTrees := []models.SysApiTree{*apiTree}
+	apiTrees2 := []models.SysApiTree{*apiTree2}
+	fromData := service.ApiService.CutApiTree(false, apiTrees, apiIds)
+	toData := service.ApiService.CutApiTree(true, apiTrees2, apiIds)
+	apiVo.FromData = fromData
+	apiVo.ToData = toData
+	resp.RespB200(c, bcode.Menu, apiVo)
 }
 
 func (service *SysClientService) AuthClientIpApi(c *gin.Context, clientId int32, ip string, apiIds []int32) {

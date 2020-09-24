@@ -6,6 +6,7 @@ import (
 	"github.com/PGshen/june/common/resp"
 	"github.com/PGshen/june/common/returncode/bcode"
 	"github.com/PGshen/june/common/returncode/ecode"
+	"github.com/PGshen/june/common/utils"
 	"github.com/PGshen/june/models"
 	"github.com/PGshen/june/models/vo"
 	"github.com/PGshen/june/repository"
@@ -76,7 +77,7 @@ func (service *SysMenuService) ListMenu(c *gin.Context, reqCond *req.ReqCond) {
 	page := reqCond.Page
 	size := reqCond.Size
 	var total int32
-	where := reqCond.Filter
+	where := utils.GetFilter(reqCond.Filter)
 	menus := service.Repo.ListMenu(page, size, &total, where)
 	res := make(map[string]interface{})
 	res["records"] = menus
@@ -94,6 +95,9 @@ func (service *SysMenuService) GetMenuByRoleId(c *gin.Context, roleId int32) {
 func (service *SysMenuService) GetMenuIdByRoleId(c *gin.Context, roleId int32) {
 	var menuIds []int32
 	menuIds = service.Repo.GetMenuIdByRoleId(roleId)
+	if menuIds == nil {
+		menuIds = []int32{}
+	}
 	resp.RespB200(c, bcode.Menu, menuIds)
 }
 
@@ -123,8 +127,12 @@ func (service *SysMenuService) getMenuTree(menuId int32) *models.SysMenuTree {
 	menuTree.SysMenu = *menu
 	sysMenus := service.Repo.GetMenusByPid(menuId)
 	// 递归查询子节点
-	for child := range sysMenus {
-		menuTree.Children = append(menuTree.Children, *service.getMenuTree(sysMenus[child].MenuId))
+	if sysMenus == nil || len(sysMenus) == 0 {
+		menuTree.Children = []models.SysMenuTree{}
+	} else {
+		for child := range sysMenus {
+			menuTree.Children = append(menuTree.Children, *service.getMenuTree(sysMenus[child].MenuId))
+		}
 	}
 	return &menuTree
 }
@@ -187,46 +195,11 @@ func (service *SysMenuService) GetMenuApiById(c *gin.Context, menuId int32) {
 	apiTrees := []models.SysApiTree{*apiTree}
 	apiTrees2 := []models.SysApiTree{*apiTree2}
 	menuApiIds := service.Repo.GetApiIdByMenuId(menuId)
-	fromData := service.cutApiTree(false, apiTrees, menuApiIds)
-	toData := service.cutApiTree(true, apiTrees2, menuApiIds)
+	fromData := service.ApiService.CutApiTree(false, apiTrees, menuApiIds)
+	toData := service.ApiService.CutApiTree(true, apiTrees2, menuApiIds)
 	menuApiVo.FromData = fromData
 	menuApiVo.ToData = toData
 	resp.RespB200(c, bcode.Menu, menuApiVo)
-}
-
-// 裁剪
-func (service *SysMenuService) cutApiTree(flag bool, trees []models.SysApiTree, menuApiIds []int32) []models.SysApiTree {
-	for e := range trees {
-		if trees[e].Children != nil {
-			trees[e].Children = service.cutApiTree(flag, trees[e].Children, menuApiIds)
-		}
-	}
-	if flag {
-		for i := 0; i < len(trees); {
-			if (trees[i].Children == nil || len(trees[i].Children) == 0) && !contains(menuApiIds, trees[i].ApiId) {
-				if i == len(trees)-1 {
-					trees = trees[:i]
-				} else {
-					trees = append(trees[:i], trees[i+1])
-				}
-			} else {
-				i++
-			}
-		}
-	} else {
-		for i := 0; i < len(trees); {
-			if (trees[i].Children == nil || len(trees[i].Children) == 0) && contains(menuApiIds, trees[i].ApiId) {
-				if i == len(trees)-1 {
-					trees = trees[:i]
-				} else {
-					trees = append(trees[:i], trees[i+1])
-				}
-			} else {
-				i++
-			}
-		}
-	}
-	return trees
 }
 
 // 绑定菜单关联的API

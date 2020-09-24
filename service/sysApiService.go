@@ -6,6 +6,7 @@ import (
 	"github.com/PGshen/june/common/resp"
 	"github.com/PGshen/june/common/returncode/bcode"
 	"github.com/PGshen/june/common/returncode/ecode"
+	"github.com/PGshen/june/common/utils"
 	"github.com/PGshen/june/models"
 	"github.com/PGshen/june/repository"
 	"github.com/gin-gonic/gin"
@@ -20,6 +21,7 @@ type ISysApiService interface {
 	GetApiTrees(c *gin.Context)
 	GetApiTreeById(c *gin.Context, id int)
 	GetApiTree(id int) *models.SysApiTree
+	CutApiTree(flag bool, trees []models.SysApiTree, menuApiIds []int32) []models.SysApiTree
 }
 
 type SysApiService struct {
@@ -74,7 +76,7 @@ func (apiService *SysApiService) ListApi(c *gin.Context, reqCond *req.ReqCond) {
 	page := reqCond.Page
 	size := reqCond.Size
 	var total int32
-	where := reqCond.Filter
+	where := utils.GetFilter(reqCond.Filter)
 	apis := apiService.Repo.ListApi(page, size, &total, where)
 	res := make(map[string]interface{})
 	res["records"] = apis
@@ -115,8 +117,47 @@ func (apiService *SysApiService) GetApiTree(id int) *models.SysApiTree {
 	apiTree.SysApi = *api
 	sysApis := apiService.Repo.GetApiByPid(id)
 	// 递归查询子节点
-	for child := range sysApis {
-		apiTree.Children = append(apiTree.Children, *apiService.GetApiTree(int(sysApis[child].ApiId)))
+	if sysApis == nil || len(sysApis) == 0 {
+		apiTree.Children = []models.SysApiTree{}
+	} else {
+		for child := range sysApis {
+			apiTree.Children = append(apiTree.Children, *apiService.GetApiTree(int(sysApis[child].ApiId)))
+		}
 	}
 	return &apiTree
+}
+
+// 裁剪
+func (apiService *SysApiService) CutApiTree(flag bool, trees []models.SysApiTree, menuApiIds []int32) []models.SysApiTree {
+	for e := range trees {
+		if trees[e].Children != nil {
+			trees[e].Children = apiService.CutApiTree(flag, trees[e].Children, menuApiIds)
+		}
+	}
+	if flag {
+		for i := 0; i < len(trees); {
+			if (trees[i].Children == nil || len(trees[i].Children) == 0) && !contains(menuApiIds, trees[i].ApiId) {
+				if i == len(trees)-1 {
+					trees = trees[:i]
+				} else {
+					trees = append(trees[:i], trees[i+1])
+				}
+			} else {
+				i++
+			}
+		}
+	} else {
+		for i := 0; i < len(trees); {
+			if (trees[i].Children == nil || len(trees[i].Children) == 0) && contains(menuApiIds, trees[i].ApiId) {
+				if i == len(trees)-1 {
+					trees = trees[:i]
+				} else {
+					trees = append(trees[:i], trees[i+1])
+				}
+			} else {
+				i++
+			}
+		}
+	}
+	return trees
 }

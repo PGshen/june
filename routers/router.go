@@ -92,7 +92,7 @@ func Configure(r *gin.Engine) {
 		sysClient.DELETE("/clients/ip/:id", client.DelClientIp)
 
 		sysClient.POST("/clients/ips/apis/list", client.GetClientIpApi)
-		sysClient.POST("/clients/ips/api", client.AuthClientIpApi)
+		sysClient.PUT("/clients/ips/api", client.AuthClientIpApi)
 	}
 	sysMenu := r.Group("/admin")
 	{

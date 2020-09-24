@@ -6,10 +6,12 @@ import (
 	"github.com/PGshen/june/common/resp"
 	"github.com/PGshen/june/common/returncode/bcode"
 	"github.com/PGshen/june/common/returncode/ecode"
+	"github.com/PGshen/june/common/utils"
 	"github.com/PGshen/june/models"
 	"github.com/PGshen/june/models/vo"
 	"github.com/PGshen/june/repository"
 	"github.com/gin-gonic/gin"
+	"strings"
 )
 
 type ISysUserService interface {
@@ -46,6 +48,9 @@ func (service *SysUserService) GetUserById(c *gin.Context, id int32) {
 
 func (service *SysUserService) SaveUser(c *gin.Context, user *models.SysUser) {
 	service.Log.Infof("Save user: user = %s", user)
+	// 默认状态，可用
+	user.IsEnable = 1
+	user.Password = strings.ToUpper(utils.MD5_ENCRYPT([]byte(user.Password)))
 	if service.Repo.InsertUser(user) {
 		// 保存角色信息
 		roleIds := user.Roles
@@ -89,8 +94,11 @@ func (service *SysUserService) ListUser(c *gin.Context, reqCond *req.ReqCond) {
 	page := reqCond.Page
 	size := reqCond.Size
 	var total int32
-	where := reqCond.Filter
+	where := utils.GetFilter(reqCond.Filter)
 	users := service.Repo.ListUser(page, size, &total, where)
+	for e := range users {
+		users[e].Roles = []int32{}
+	}
 	res := make(map[string]interface{})
 	res["records"] = users
 	res["total"] = total

@@ -6,6 +6,7 @@ import (
 	"github.com/PGshen/june/common/resp"
 	"github.com/PGshen/june/common/returncode/bcode"
 	"github.com/PGshen/june/common/returncode/ecode"
+	"github.com/PGshen/june/common/utils"
 	"github.com/PGshen/june/models"
 	"github.com/PGshen/june/models/vo"
 	"github.com/PGshen/june/repository"
@@ -71,7 +72,7 @@ func (service *SysRoleService) ListRole(c *gin.Context, reqCond *req.ReqCond) {
 	page := reqCond.Page
 	size := reqCond.Size
 	var total int32
-	where := reqCond.Filter
+	where := utils.GetFilter(reqCond.Filter)
 	roles := service.Repo.ListRole(page, size, &total, where)
 	res := make(map[string]interface{})
 	res["records"] = roles
@@ -90,6 +91,9 @@ func (service *SysRoleService) GetRoleByUserId(userId int32) []*models.SysRole {
 
 func (service *SysRoleService) GetRoleIdByUserId(c *gin.Context, userId int32) {
 	data := service.Repo.GetRoleIdByUserId(userId)
+	if data == nil {
+		data = []int32{}
+	}
 	resp.RespB200(c, bcode.Role, data)
 }
 

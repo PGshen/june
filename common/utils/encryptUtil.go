@@ -72,7 +72,11 @@ func AES_CBC_Decrypt(cipherText []byte, key []byte) []byte {
 func MD5_ENCRYPT(s []byte) string {
 	m := md5.New()
 	// 去除字节数组后面的0
-	m.Write(s[:bytes.IndexByte(s, 0)])
+	if bytes.IndexByte(s, 0) > -1 {
+		m.Write(s[:bytes.IndexByte(s, 0)])
+	} else {
+		m.Write(s)
+	}
 	return hex.EncodeToString(m.Sum(nil))
 }
 

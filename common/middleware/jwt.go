@@ -98,7 +98,7 @@ func (j *Jwt) GinJWTMiddlewareInit(jwtAuthorizator JwtAuthorizator) (authMiddlew
 		Authorizator: jwtAuthorizator,
 		//handles unauthorized logic
 		Unauthorized: func(c *gin.Context, code int, message string) {
-			resp.RespBusiData(c, hcode.Ok, tcode.Business, bcode.Auth, ecode.P0508, "授权失败", nil)
+			resp.RespBusiData(c, hcode.Forbidden, tcode.Business, bcode.Auth, ecode.P0508, "授权失败", nil)
 		},
 		LoginResponse: func(c *gin.Context, code int, token string, expire time.Time) {
 			data := map[string]interface{}{
