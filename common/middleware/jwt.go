@@ -139,7 +139,7 @@ func Authorizator(data interface{}, c *gin.Context) bool {
 			if permMatch(perm, method, uri) {
 				return true
 			}
-			return true
+			//return true
 		}
 	}
 	return false
